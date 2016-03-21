@@ -79,6 +79,7 @@ SingleLinkedList.prototype = {
 		var tmpNode;
 		var data;
 		if (!this.isLast(prevNode)) {
+			// 被删除节点
 			tmpNode = prevNode.next;
 			prevNode.next = tmpNode.next;
 			data = tmpNode.data;
