@@ -17,6 +17,10 @@ Stack.prototype = {
 	},
 
 	pop: function() {
+		if (this.isEmpty()) {
+			return;
+		}
+		
 		var delNode = this.head.next;
 		var data = delNode.data;
 		this.head.next = delNode.next;
