@@ -89,6 +89,8 @@ SingleLinkedList.prototype = {
 	}
 };
 
+module.exports = SingleLinkedList;
+
 var list = new SingleLinkedList([1, 2, 3]);
 console.log(list.findPrevious(1));
 console.log(list.delete(2));
