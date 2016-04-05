@@ -1,6 +1,5 @@
 function Node(data, parent, left, right) {
     this.data = data;
-    this.parent = parent || null;
     this.left = left;
     this.right = right;
 }
@@ -67,59 +66,97 @@ BinarySearchTree.prototype = {
      * 插入
      */
     insert: function(val, treeNode) {
-        treeNode = treeNode ? treeNode : this.root;
+        var newNode = new Node(val);
         if (this.root == null) {
-            this.root = new Node(val);
-            return this.root;
+            this.root = newNode;
+            return;
         }
-        if (val < treeNode.data) {
-            if (treeNode.left == undefined) {
-                treeNode.left = new Node(val, treeNode);
-                return treeNode.left;
+
+        var current = this.root;
+        var parent;
+        while (true) {
+            parent = current;
+            if (val < current.data) {
+                current = current.left;
+                if (current == null) {
+                    parent.left = newNode;
+                    break;
+                }
             } else {
-                return this.insert(val, treeNode.left);
-            }
-        } else if (val > treeNode.data) {
-            if (treeNode.right == undefined) {
-                treeNode.right = new Node(val, treeNode);
-                return treeNode.right;
-            } else {
-                return this.insert(val, treeNode.right);
+                current = current.right;
+                if (current == null) {
+                    parent.right = newNode;
+                    break;
+                }
             }
         }
     },
 
     /**
-     * 删除
-     */
-    delete: function(key, treeNode) {
-        treeNode = treeNode ? treeNode : this.root;
-        // 空树
-        if (this.root == null) {
+    * 删除
+    */
+    delete: function(data) {
+        this.root = this.deleteNode(data, this.root);
+    },
+
+    deleteNode: function(data, treeNode) {
+        if (treeNode == null) {
             return null;
         }
-
-        var tmpNode;
-        if (key < treeNode.data) {
-            return this.delete(key, treeNode.left);
-        } else if (key > treeNode.data) {
-            return this.delete(key, treeNode.right);
-        } else if (treeNode.left !== undefined && treeNode.right !== undefined) {
-            tmpNode = this.findMin(treeNode.right);
-            treeNode.data = tmpNode.data;
-            this.delete(treeNode.data, treeNode.right);
-        } else {
-            if (treeNode.left == undefined && treeNode.right == undefined) {
-                if (treeNode.data < treeNode.parent.data) {
-                    treeNode.parent.left = undefined;
-                } else {
-                    treeNode.parent.right = undefined;
-                }
-            } else if (treeNode.left == undefined) {
-                treeNode = treeNode.right;
-            } else if (treeNode.right == undefined) {
-                treeNode = treeNode.left;
+        if (data === treeNode.data) {
+            // 没有子节点
+            if (treeNode.left == null && treeNode.right == null) {
+                return null;
             }
+            if (treeNode.left == null) {
+                return treeNode.right;
+            }
+            if (treeNode.right == null) {
+                return treeNode.left;
+            }
+            var tmpNode = this.findMin(treeNode.right);
+            treeNode.data = tmpNode.data;
+            treeNode.right = this.deleteNode(tmpNode.data, treeNode.right);
+            return treeNode;
+        } else if (data < treeNode.data) {
+            treeNode.left = this.deleteNode(data, treeNode.left);
+            return treeNode;
+        } else {
+            treeNode.right = this.deleteNode(data, treeNode.right);
+            return treeNode;
+        }
+    },
+
+    /**
+     * 先序遍历
+     */
+    preOrder: function(node) {
+        if (node != null) {
+            console.log(node.data);
+            this.preOrder(node.left);
+            this.preOrder(node.right);
+        }
+    },
+
+    /**
+     * 中序遍历
+     */
+    inOrder: function(node) {
+        if (node != null) {
+            this.preOrder(node.left);
+            console.log(node.data);
+            this.preOrder(node.right);
+        }
+    },
+
+    /**
+     * 后序遍历
+     */
+    postOrder: function(node) {
+        if (node != null) {
+            console.log(node.data);
+            this.preOrder(node.left);
+            this.preOrder(node.right);
         }
     }
 };
