@@ -65,7 +65,7 @@ BinarySearchTree.prototype = {
     /**
      * 插入
      */
-    insert: function(val, treeNode) {
+    insert: function(val) {
         var newNode = new Node(val);
         if (this.root == null) {
             this.root = newNode;
