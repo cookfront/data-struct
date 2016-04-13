@@ -215,6 +215,7 @@ AvlTree.prototype = {
 					this.minNode = replacementNode;
 			}
 
+			// 更新删除节点父节点的子节点的指向
 			if (node.isLeftChild()) {
 				node.parent.left = replacementNode;
 			} else if (node.isRightChild()) {
