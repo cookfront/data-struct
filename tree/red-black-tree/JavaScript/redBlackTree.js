@@ -31,8 +31,14 @@ Node.prototype = {
 	 * 是否为红节点
 	 */
 	isRed: function() {
-		console.log('xxxx');
 		return this.color === 'red';
+	},
+
+	/**
+	 * 是否为黑节点
+	 */
+	isBlack: function() {
+		return this.color === 'black';
 	},
 
 	/**
@@ -189,13 +195,161 @@ RedBlackTree.prototype = {
 		}
 	},
 
-	deleteBalance: function() {
+	delete: function(value) {
+		var node = this.find(value);
+		if (node == null) return;
 
+		// 删除节点左子树和右子树都不为空
+		if (node.left != null && node.right != null) {
+			var leftMaxNode = this.findMax(node.left);
+			node.value = leftMaxNode.value;
+			node = leftMaxNode;
+		}
+
+		var child = (node.right === null) ? node.left : node.right;
+		if (node.isBlack()) {
+			node.color = child.color;
+			this.deleteCase1(node);
+		}
+
+		this.balancer.replaceNode(node, child);
+		this.root.color = 'black';
 	},
 
-	delete: function() {
+	deleteCase1: function(node) {
+		if (node.parent != null) {
+			this.deleteCase2(node);
+		}
+	},
 
-	}
+	deleteCase2: function(node) {
+		var sibling = node.sibling();
+
+		if (sibling.isRed()) {
+			node.parent.color = 'red';
+			sibling.color = 'black';
+			if (node.isLeftChild()) {
+				this.leftRotate(node.parent);
+			} else {
+				this.rightRotate(node.parent);
+			}
+		}
+
+		this.deleteCase3(node);
+	},
+
+	deleteCase3: function(node) {
+		var sibling = node.sibling();
+
+		if (node.parent.isBlack()
+			&& sibling.isBlack()
+			&& sibling.left.isBlack()
+			&& sibling.right.isBlack()) {
+			sibling.color = 'red';
+			this.deleteCase1(node.parent);
+		} else {
+			this.deleteCase4(node);
+		}
+	},
+
+	deleteCase4: function(node) {
+		var sibling = node.sibling();
+
+		if (node.parent.isRed()
+			&& sibling.isBlack()
+			&& sibling.left.isBlack()
+			&& sibling.right.isBlack()) {
+			sibling.color = 'red';
+			node.parent.color = 'black';
+		} else {
+			this.deleteCase5(node);
+		}
+	},
+
+	deleteCase5: function(node) {
+		var sibling = node.sibling();
+
+		if (node.isLeftChild()
+			&& sibling.isBlack()
+			&& sibling.left.isRed()
+			&& sibling.right.isBlack()) {
+			sibling.color = 'red';
+			sibling.left.color = 'black';
+			this.rightRotate(sibling);
+		} else if (node.isRightChild()
+			&& sibling.isBlack()
+			&& sibling.left.isBlack()
+			&& sibling.right.isRed()) {
+			sibling.color = 'red';
+			sibling.right.color = 'black';
+			this.leftRotate(sibling);
+		}
+
+		this.deleteCase6(node);
+	},
+
+	deleteCase6: function(node) {
+		var sibling = node.sibling();
+		sibling.color = node.parent.color;
+		node.parent.color = 'black';
+
+		if (node.isLeftChild()) {
+			sibling.right.color = 'black';
+			this.leftRotate(node.parent);
+		} else {
+			sibling.left.color = 'black';
+			this.rightRotate(node.parent);
+		}
+	},
+
+	find: function(value, treeNode) {
+		treeNode = treeNode ? treeNode : this.root;
+        // 空树
+        if (this.root == null) {
+            return null;
+        }
+
+        if (key < treeNode.data) {
+            return this.find(key, treeNode.left);
+        } else if (key > treeNode.data) {
+            return this.find(key, treeNode.right);
+        } else {
+            return treeNode;
+        }
+	},
+	/**
+     * 找到最小值
+     */
+    findMin: function(treeNode) {
+        treeNode = treeNode ? treeNode : this.root;
+        // 空树
+        if (this.root == null) {
+            return null;
+        }
+
+        if (treeNode.left == null) {
+            return treeNode;
+        } else {
+            return this.findMin(treeNode.left);
+        }
+    },
+
+    /**
+     * 找到最大值
+     */
+    findMax: function(treeNode) {
+        treeNode = treeNode ? treeNode : this.root;
+        // 空树
+        if (this.root == null) {
+            return null;
+        }
+
+        if (treeNode.right == null) {
+            return treeNode;
+        } else {
+            return this.findMax(treeNode.right);
+        }
+    },
 };
 
 var tree = new RedBlackTree();
